@@ -1,4 +1,7 @@
-export function createUniqName(baseName: string = 'test'): string {
+import { APIRequestContext, TestInfo } from '@playwright/test';
+import { baseProxyUrl } from '../data/testData'; 
+
+export function createUniqueName(baseName: string = 'test'): string {
     const currentTime = new Date();
     const formattedTime = currentTime.toISOString().slice(0, 16).replace('T', '_').replace(':', '');
     return `${baseName}_${formattedTime}`;
@@ -11,8 +14,15 @@ export function createUniqName(baseName: string = 'test'): string {
     console.log('Response Body:', JSON.stringify(responseBody, null, 2));
   }
 
-  export const proxyRequest = async (method: 'GET' | 'POST' | 'PUT' | 'DELETE', endpoint: string, options: any, request: any, apiKey: any, baseUrl: string) => {
-    const proxyUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(baseUrl + endpoint)}`;
+  export const proxyRequest = async (
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
+    endpoint: string, 
+    options: Record<string, unknown>, 
+    request: APIRequestContext, 
+    apiKey: string, 
+    baseUrl: string
+  ) => {
+    const proxyUrl = `${baseProxyUrl}?api_key=${apiKey}&url=${encodeURIComponent(baseUrl + endpoint)}`;
     
     console.log(`Request URL: ${proxyUrl}`); 
   
@@ -30,7 +40,7 @@ export function createUniqName(baseName: string = 'test'): string {
     }
   };
 
-  export const attachResponseDetails = async (response: any, testInfo: any, attachmentName: any) => {
+  export const attachResponseDetails = async (response: any, testInfo: TestInfo, attachmentName: string) => {
     const responseDetails = `
       Status: ${response.status()}\n
       Headers: ${JSON.stringify(response.headers(), null, 2)}\n

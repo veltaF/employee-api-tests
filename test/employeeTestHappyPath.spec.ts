@@ -1,19 +1,17 @@
-import { test, expect, APIResponse } from '@playwright/test';
-import { createUniqName, logResponse, attachResponseDetails } from '../lib/utils';
-import { proxyRequest } from '../lib/utils'; 
+import { test, expect } from '@playwright/test';
+import { createUniqueName, attachResponseDetails, proxyRequest } from '../lib/utils';
 import dotenv from 'dotenv';
 import { baseUrl } from '../data/testData'; 
 
 dotenv.config();
-const SCRAPERAPI_KEY = process.env.SCRAPERAPI_KEY;
-
+const SCRAPERAPI_KEY = process.env.SCRAPERAPI_KEY || 'default_api_key';
 
 test.describe('Employee API Test Suite', () => {
 
-  test('POST: Add New Record to the system', async ({ request }, testInfo) => {
+  test('POST: Add New Record to the system @positiveScenarios', async ({ request }, testInfo) => {
     let responseBody: any;
     const employeeData = {
-      name: createUniqName(),
+      name: createUniqueName(),
       salary: '123',
       age: '23',
     };
@@ -40,10 +38,10 @@ test.describe('Employee API Test Suite', () => {
     });
 
     await test.step("Then the user verifies that the new record was created successfully", async () => {
-        const employeeId = responseBody.data.id;
-        expect(employeeId).toBeDefined(); 
-        expect(employeeId).toBeGreaterThan(0); 
-      });
+      const employeeId = responseBody.data.id;
+      expect(employeeId).toBeDefined(); 
+      expect(employeeId).toBeGreaterThan(0); 
+    });
 
     await test.step("Then the user verifies that the new record was created successfully", async () => {
       expect(responseBody.status).toBe('success');
@@ -55,9 +53,9 @@ test.describe('Employee API Test Suite', () => {
   });
 
 
-  test('GET /employee/{id} - Fetch employee by ID ', async ({ request }, testInfo) => {
+  test('GET /employee/{id} - Fetch employee by ID @positiveScenarios', async ({ request }, testInfo) => {
     let responseBody: any;
-    const employeeId = 7502
+    const employeeId = 7502;
 
     await test.step("When the user sends a GET request to fetch the employee", async () => {
       const response = await proxyRequest('GET', `/employee/${employeeId}`, {
@@ -72,8 +70,8 @@ test.describe('Employee API Test Suite', () => {
     });
   
     await test.step("And the user verifies the success message in the response", async () => {
-        expect(responseBody.message).toBe('Successfully! Record has been fetched.');
-        console.log('Response Body:', responseBody);
+      expect(responseBody.message).toBe('Successfully! Record has been fetched.');
+      console.log('Response Body:', responseBody);
     });
   });
 });
